@@ -34,20 +34,6 @@ function createMesh (meshData, info)
 			if (wired) {
 				Array.prototype.push.apply(mesh.indices.data, [ a,b, a,c, c,b ]);
 
-				var x = mesh.position.data[a*3		] + mesh.position.data[b*3		] + mesh.position.data[c*3		];
-				var y = mesh.position.data[a*3 + 1] + mesh.position.data[b*3 + 1] + mesh.position.data[c*3 + 1];
-				var z = mesh.position.data[a*3 + 2] + mesh.position.data[b*3 + 2] + mesh.position.data[c*3 + 2];
-				var anchor = [ x / 3.0, y / 3.0, z / 3.0 ];
-				mesh.anchor.data[a*3		] = anchor[0];
-				mesh.anchor.data[a*3 + 1] = anchor[1];
-				mesh.anchor.data[a*3 + 2] = anchor[2];
-				mesh.anchor.data[b*3		] = anchor[0];
-				mesh.anchor.data[b*3 + 1] = anchor[1];
-				mesh.anchor.data[b*3 + 2] = anchor[2];
-				mesh.anchor.data[c*3		] = anchor[0];
-				mesh.anchor.data[c*3 + 1] = anchor[1];
-				mesh.anchor.data[c*3 + 2] = anchor[2];
-
 			} else {
 				Array.prototype.push.apply(mesh.indices.data, [ a, b, c ]);
 			}
