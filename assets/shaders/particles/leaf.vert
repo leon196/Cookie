@@ -57,18 +57,21 @@ void main ()
 	vec4 position = u_world * a_position;
 
 	// size *= u_value;
-	float size = 0.05;
+	float size = 0.02;
 
 	// position.w = 1.0;
 
-	vec3 up = normalize(vec3(a_normal.x, a_normal.y, 0.0));
-	vec3 right = vec3(up.y, -up.x, 0);
+	// vec3 up = a_normal;//normalize(vec3(a_normal.x, a_normal.y, 0.0));
+	// vec3 right = vec3(up.y, -up.x, 0);
 	// up.x *= aspect;
 	// right.x *= aspect;
 
-	position = (u_view * position);
+	vec3 right = normalize(cross(vec3(1,0,0), a_normal));
+	vec3 up = normalize(cross(right, a_normal));
+
 	position.xyz += up * a_anchor.x * size;
 	position.xyz += right * a_anchor.y * size;
+	position = (u_view * position);
 	// position.z = 1.0;
 
 	v_color = a_color;

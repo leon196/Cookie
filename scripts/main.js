@@ -8,6 +8,7 @@ var particles;
 var particleTexture;
 var PI = 3.1416;
 var program2, programInfo2;
+var frameBuffer;
 window.onload = function ()
 {
   loadAssets(init);
@@ -18,8 +19,8 @@ function init () {
 
   twgl.setDefaults({attribPrefix: "a_"});
   gl = twgl.getWebGLContext(document.getElementById("view"), {
-    // premultipliedAlpha: false,
-    // alpha: false
+    premultipliedAlpha: false,
+    alpha: false
   });
 
   program = twgl.createProgramFromSources(gl, [assets["leaf.vert"], assets["color.frag"]]);
@@ -40,7 +41,12 @@ function init () {
     src: "assets/images/Circle.png",
     flipY: true,
     wrap: gl.CLAMP_TO_EDGE,
+    min: gl.LINEAR,
+    mag: gl.LINEAR,
   }) 
+
+  frameBuffer = new FrameBuffer();
+  // frameBuffer.createBuffer(gl, width, height, points);
 
   uniforms = {
     u_lightWorldPos: [1, 8, -10],

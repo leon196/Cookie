@@ -1,17 +1,15 @@
 
-function FrameBuffer (attachements)
+function FrameBuffer ()
 {
 	this.array = [];
 	this.current = 0;
-	this.attachements = attachements;
 
-	this.createBuffer = function (gl, width, height, count)
+	this.createBuffer = function (gl, width, height, points)
 	{
-		count = count || 2;
-		for (var i = 0; i < count; ++i)
+		for (var i = 0; i < 2; ++i)
 		{
-			var frameBuffer = twgl.createTexture(gl, { type: gl.FLOAT, min: gl.NEAREST, mag: gl.NEAREST, wrap: gl.CLAMP_TO_EDGE, width: width, height: height });
-			this.array.push(frameBuffer);
+			var frame = twgl.createTexture(gl, { type: gl.FLOAT, min: gl.NEAREST, mag: gl.NEAREST, wrap: gl.CLAMP_TO_EDGE, width: width, height: height, src: points });
+			this.array.push(frame);
 		}
 	}
 
