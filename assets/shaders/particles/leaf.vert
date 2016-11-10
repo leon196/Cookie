@@ -1,8 +1,10 @@
+precision mediump float;
 
-attribute vec3 a_position;
+attribute vec4 a_position;
 attribute vec4 a_color;
 attribute vec3 a_normal;
 attribute vec2 a_texcoord;
+attribute vec2 a_anchor;
 
 uniform float u_time;
 uniform vec2 u_resolution;
@@ -20,58 +22,56 @@ varying vec4 v_color;
 varying vec3 v_normal;
 varying float v_depth;
 
+float luminance ( vec3 color )
+{
+	return (color.r + color.g + color.b) / 3.0;
+}
+
+// hash based 3d value noise
+// function taken from https://www.shadertoy.com/view/XslGRr
+// Created by inigo quilez - iq/2013
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+
+// ported from GLSL to HLSL
+float hash( float n )
+{
+	return fract(sin(n)*43758.5453);
+}
+
+float noiseIQ( vec3 x )
+{
+	// The noise function returns a value in the range -1.0f -> 1.0f
+	vec3 p = floor(x);
+	vec3 f = fract(x);
+	f       = f*f*(3.0-2.0*f);
+	float n = p.x + p.y*57.0 + 113.0*p.z;
+	return mix(mix(mix( hash(n+0.0), hash(n+1.0),f.x),
+	 mix( hash(n+57.0), hash(n+58.0),f.x),f.y),
+	mix(mix( hash(n+113.0), hash(n+114.0),f.x),
+	 mix( hash(n+170.0), hash(n+171.0),f.x),f.y),f.z);
+}
+
 void main ()
 {
 	float aspect = u_resolution.y / u_resolution.x;
-	vec4 position = vec4(a_position.xyz, 1);
+	vec4 position = u_world * a_position;
 
+	// size *= u_value;
+	float size = 0.05;
 
-	float distanceTarget = length((u_world * position).xyz - u_target) / 3.;
+	// position.w = 1.0;
 
-	float ratio = step(distanceTarget, 1.) * mod(abs(-u_time * 0.5 + distanceTarget), 1.0);
-	// float ratio = clamp(distanceTarget, 0., 1.) * mod(abs(-u_time * 0.5 + distanceTarget), 1.0);
-	// float ratio = (1. - clamp(distanceTarget, 0., 1.));// * (1. - max(0., sin(-u_time * 4. + distanceTarget * 3.)));
-	// float ratio = clamp(distanceTarget, 0., 1.) * (1. - max(0., sin(-u_time * 2. + distanceTarget)));
-	// float ratio = min(1., mod(abs(-u_time * 0.5 + distanceTarget), 2.0));
-
-	vec3 displacement = normalize(vec3(a_normal.x, -3., a_normal.z));
-	displacement *= ratio * 3. * luminance(a_color.rgb) * smoothstep(0.5, 1., ratio);
-	position.xyz += displacement;
-
-	// float timeSpeed = .5;
-	// float lum = (a_color.r + a_color.b + a_color.g) / 3.0;
-	// float green = clamp(a_color.g - a_color.b - a_color.r, 0., 1.);
-	// float osc = sin((sin(u_time * timeSpeed) * 0.5 + 0.5) * 3.1416);
-
-	// float offset =  - ((distanceFromCenter / 5.) * osc * 5.);
-	// float offset =  - ((lum - distanceFromCenter / 5.) * osc * 5.);
-	// float o = sin(u_time * timeSpeed) * 0.5 + 0.5;
-
-	// grow
-	// float ratio = 1. - smoothstep(u_ground, u_top, mix(u_ground, anch.y + u_top, o) + offset);
-	// anch.y = mix(u_ground, anch.y, ratio);
-	// anch.y = mix(anch.y, u_ground, smoothstep(u_ground, u_top, anch.y - (u_top - u_ground) * o));
-	// size = mix(0., size, ratio);//1. - smoothstep(u_ground, u_top, anch.y + (u_top - u_ground) * sin(u_time * 2.)));
-
-	// cycle
-	vec2 pulse = vec2(sin(u_time * 8. + noiseIQ(a_normal) * 10.) * 0.5 + 0.5);
-	pulse.x *= 2.0;
-	// pulse *= 0.2;
-	pulse += vec2(1.0);
-	vec2 size = u_leafSize * smoothstep(0., 0.25, ratio) * (1. - smoothstep(0.9, 1., ratio)) * pulse;
-
-	size *= u_value;
-
-	position = (u_view * vec4(position.xyz, 1));
-
-	vec3 up = normalize(vec3(a_normal.x, a_normal.y, 0));
+	vec3 up = normalize(vec3(a_normal.x, a_normal.y, 0.0));
 	vec3 right = vec3(up.y, -up.x, 0);
-	up.x *= aspect;
-	right.x *= aspect;
+	// up.x *= aspect;
+	// right.x *= aspect;
 
-	position.xyz += up * a_texcoord.x * size.x;
-	position.xyz += right * a_texcoord.y * size.y;
+	position = (u_view * position);
+	position.xyz += up * a_anchor.x * size;
+	position.xyz += right * a_anchor.y * size;
+	// position.z = 1.0;
 
 	v_color = a_color;
+	v_texCoord = a_texcoord;
 	gl_Position = position;
 }

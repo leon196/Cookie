@@ -5,6 +5,9 @@ var filePathList = [
   "assets/shaders/cube.vert", 
   "assets/shaders/cube.frag",
   "assets/models/Cookie.ply",
+  "assets/models/CookieCloud25k.ply",
+  "assets/shaders/particles/leaf.vert",
+  "assets/shaders/simple/color.frag",
 ]
 
 function loadAssets(onComplete) {

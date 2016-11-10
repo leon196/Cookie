@@ -8,7 +8,7 @@ html, body
 {
 	overflow: hidden;
 	height:100%;
-	background: black url('loader.gif') center no-repeat;
+	/*background: black url('loader.gif') center no-repeat;*/
 }
 
 canvas 
