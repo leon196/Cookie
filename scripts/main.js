@@ -2,7 +2,7 @@
 "use strict";
 var gl;
 var m4 = twgl.m4;
-var program, programInfo, arrays, bufferInfo, tex, uniforms;
+var program, programInfo, bufferCookie, bufferCookieWired, tex, uniforms;
 
 window.onload = function ()
 {
@@ -18,16 +18,8 @@ function init () {
   program = twgl.createProgramFromSources(gl, [assets["cube.vert"], assets["cube.frag"]]);
   programInfo = twgl.createProgramInfoFromProgram(gl, program);
 
-  arrays = {
-    position: [1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1],
-    normal:   [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
-    texcoord: [1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-    indices:  [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23],
-  };
-
-  arrays = createMesh(assets["Cookie.ply"]);
-
-  bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+  bufferCookie = twgl.createBufferInfoFromArrays(gl, createMesh(assets["Cookie.ply"]));
+  bufferCookieWired = twgl.createBufferInfoFromArrays(gl, createMesh(assets["Cookie.ply"], {wired:true}));
 
   tex = createTexture({
     src: "assets/models/Cookie.png",
@@ -42,6 +34,8 @@ function init () {
     u_shininess: 0,
     u_specularFactor: 0,
     u_diffuse: tex,
+    u_time: 0,
+    u_scale: 0.0,
   };
 }
 
@@ -64,17 +58,30 @@ function render(time) {
     var camera = m4.lookAt(eye, target, up);
     var view = m4.inverse(camera);
     var viewProjection = m4.multiply(view, projection);
-    var world = m4.identity();// m4.rotationY(time);
+    var world = m4.rotationY(time * 0.1);
 
     uniforms.u_viewInverse = camera;
     uniforms.u_world = world;
+    uniforms.u_view = viewProjection;
+    uniforms.u_time = time;
     uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
     uniforms.u_worldViewProjection = m4.multiply(world, viewProjection);
+    uniforms.u_scale = 0.0;
 
     gl.useProgram(programInfo.program);
-    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+    twgl.setBuffersAndAttributes(gl, programInfo, bufferCookie);
     twgl.setUniforms(programInfo, uniforms);
-    gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, bufferCookie.numElements, gl.UNSIGNED_SHORT, 0);
+
+    // world = m4.scale(world, [1.1,1.1,1.1], world);
+    // uniforms.u_world = world;
+    // uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
+    // uniforms.u_worldViewProjection = m4.multiply(world, viewProjection);
+    uniforms.u_scale = 0.1;
+    gl.useProgram(programInfo.program);
+    twgl.setBuffersAndAttributes(gl, programInfo, bufferCookieWired);
+    twgl.setUniforms(programInfo, uniforms);
+    gl.drawElements(gl.LINES, bufferCookieWired.numElements, gl.UNSIGNED_SHORT, 0);
   }
   requestAnimationFrame(render);
 }
