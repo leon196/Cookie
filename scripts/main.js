@@ -1,5 +1,6 @@
 
 "use strict";
+
 var gl;
 var m4 = twgl.m4;
 var program, programInfo, bufferCookie, bufferCookieWired, tex, uniforms;
@@ -7,28 +8,31 @@ var bufferParticles;
 var particles;
 var particleTexture;
 var PI = 3.1416;
-var program2, programInfo2;
 var frameBuffer;
+var particleShader;
+var diffuseShader;
+var cookieMesh;
+
 window.onload = function ()
 {
   loadAssets(init);
   requestAnimationFrame(render);
 }
 
-function init () {
-
+function init ()
+{
   twgl.setDefaults({attribPrefix: "a_"});
   gl = twgl.getWebGLContext(document.getElementById("view"), {
     premultipliedAlpha: false,
     alpha: false
   });
 
-  program = twgl.createProgramFromSources(gl, [assets["leaf.vert"], assets["color.frag"]]);
-  programInfo = twgl.createProgramInfoFromProgram(gl, program);
-  program2 = twgl.createProgramFromSources(gl, [assets["cube.vert"], assets["cube.frag"]]);
-  programInfo2 = twgl.createProgramInfoFromProgram(gl, program2);
+  particleShader = new Shader("leaf.vert", "color.frag");
+  diffuseShader = new Shader("cube.vert", "cube.frag");
 
-  bufferCookie = twgl.createBufferInfoFromArrays(gl, createMesh(assets["Cookie.ply"]));
+  cookieMesh = new Mesh("Cookie.ply");
+
+  bufferCookie = twgl.createBufferInfoFromArrays(gl, CreateBufferFromFile(assets["Cookie.ply"]));
   // bufferCookieWired = twgl.createBufferInfoFromArrays(gl, createMesh(assets["Cookie.ply"], {wired:true}));
   particles = parsePointCloud(assets["CookieCloud25k.ply"]);
   bufferParticles = twgl.createBufferInfoFromArrays(gl, createParticles(particles.points));
@@ -91,30 +95,28 @@ function render(time) {
     
     // m4.translate(m4.identity(), particles.middle, world);
     world = m4.rotationX(-PI * 0.5);
-    world = m4.rotateZ(world, time * 0.1);
+    // world = m4.rotateZ(world, time * 0.1);
 
     gl.disable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    uniforms.u_world = world;
-    uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
-    uniforms.u_worldViewProjection = m4.multiply(world, viewProjection);
-    gl.useProgram(programInfo.program);
-    twgl.setBuffersAndAttributes(gl, programInfo, bufferParticles);
-    twgl.setUniforms(programInfo, uniforms);
-    gl.drawElements(gl.TRIANGLES, bufferParticles.numElements, gl.UNSIGNED_SHORT, 0);
-
-    // gl.enable(gl.DEPTH_TEST);
-    // gl.disable(gl.BLEND);
-    // world = m4.rotationY(time * 0.1);
     // uniforms.u_world = world;
     // uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
     // uniforms.u_worldViewProjection = m4.multiply(world, viewProjection);
-    // gl.useProgram(programInfo2.program);
-    // twgl.setBuffersAndAttributes(gl, programInfo2, bufferCookie);
-    // twgl.setUniforms(programInfo2, uniforms);
-    // gl.drawElements(gl.TRIANGLES, bufferCookie.numElements, gl.UNSIGNED_SHORT, 0);
+    // gl.useProgram(programInfo.program);
+    // twgl.setBuffersAndAttributes(gl, programInfo, bufferParticles);
+    // twgl.setUniforms(programInfo, uniforms);
+    // gl.drawElements(gl.TRIANGLES, bufferParticles.numElements, gl.UNSIGNED_SHORT, 0);
+
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+    world = m4.rotationY(time * 0.1);
+    uniforms.u_world = world;
+    uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
+    uniforms.u_worldViewProjection = m4.multiply(world, viewProjection);
+
+    cookieMesh.draw(diffuseShader, uniforms);
   }
   requestAnimationFrame(render);
 }

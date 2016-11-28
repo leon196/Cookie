@@ -1,7 +1,7 @@
 
 "use strict";
 
-function createMesh (meshData, info)
+function CreateBufferFromFile (meshData, info)
 {
 	info = info || {};
 	var wired = info.wired || false;

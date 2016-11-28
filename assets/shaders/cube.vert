@@ -22,6 +22,7 @@ void main() {
   v_texCoord = a_texcoord;
   v_normal = (u_worldInverseTranspose * vec4(a_normal, 0)).xyz;
   vec4 position = u_world * a_position;
+  // position.xyz = normalize(position) * mod(length(position + u_time), 5.0);
   // position.y += 0.01 * (sin(-u_time * 4.0 + 50.0 * length(position)) * 0.5 + 0.5);
   // position.
   // position.xyz += 0.2 * v_normal.xyz * (sin(-u_time * 4.0 + 10.0 * length(position)) * 0.5 + 0.5);

@@ -56,6 +56,8 @@ void main ()
 	float aspect = u_resolution.y / u_resolution.x;
 	vec4 position = u_world * a_position;
 
+  position.xyz = normalize(position.xyz) * mod(length(position) + u_time * 0.2, 0.75);
+
 	// size *= u_value;
 	float size = 0.02;
 
