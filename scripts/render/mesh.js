@@ -1,16 +1,15 @@
 
 "use strict";
 
-function Mesh (fileName)
+function Mesh (arrays)
 {
-  this.arrays = CreateBufferFromFile(assets[fileName]);
-  this.buffer = twgl.createBufferInfoFromArrays(gl, this.arrays);
+	this.buffer = twgl.createBufferInfoFromArrays(gl, arrays);
 
-  this.draw = function (shader, uniforms)
-  {
-    gl.useProgram(shader.program);
-    twgl.setBuffersAndAttributes(gl, shader.info, this.buffer);
-    twgl.setUniforms(shader.info, uniforms);
-    gl.drawElements(gl.TRIANGLES, this.buffer.numElements, gl.UNSIGNED_SHORT, 0);
-  }
+	this.draw = function (shader, uniforms)
+	{
+		gl.useProgram(shader.program);
+		twgl.setBuffersAndAttributes(gl, shader.info, this.buffer);
+		twgl.setUniforms(shader.info, uniforms);
+		gl.drawElements(gl.TRIANGLES, this.buffer.numElements, gl.UNSIGNED_SHORT, 0);
+	}
 }
