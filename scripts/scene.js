@@ -15,42 +15,27 @@ function Scene ()
 		this.circleTexture = new Texture("assets/images/Circle.png");
 
 		this.frameBuffer = new FrameBuffer();
+		
+		this.uniforms = new Uniforms();
+		this.uniforms.u_diffuse = this.cookieTexture.data;
+		this.uniforms.u_sprite = this.circleTexture.data;
+		this.uniforms.u_scale = 0.0;
 
-		this.uniforms = {
-			u_lightWorldPos: [1, 8, -10],
-			u_lightColor: [1, 0.8, 0.8, 1],
-			u_ambient: [0, 0, 0, 1],
-			u_specular: [1, 1, 1, 1],
-			u_shininess: 0,
-			u_specularFactor: 0,
-			u_diffuse: this.cookieTexture.data,
-			u_sprite: this.circleTexture.data,
-			u_time: 0,
-			u_scale: 0.0,
-		};
-
-		this.projection = m4.perspective(30 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 1000);
-		this.eye = [1, 2, -3];
-		this.target = [0, 0, 0];
-		this.up = [0, 1, 0];
-
-		this.camera = m4.lookAt(this.eye, this.target, this.up);
-		this.view = m4.inverse(this.camera);
-		this.viewProjection = m4.multiply(this.view, this.projection);
+		this.camera = new Camera();
 		this.world = m4.identity();
 	}
 
 	this.render = function (time)
 	{
-		this.uniforms.u_viewInverse = this.camera;
+		this.uniforms.u_viewInverse = this.camera.matrix;
 		this.uniforms.u_world = this.world;
-		this.uniforms.u_view = this.viewProjection;
+		this.uniforms.u_view = this.camera.viewProjectionMatrix;
 		this.uniforms.u_time = time;
 		this.uniforms.u_scale = 0.0;
 		
 		this.uniforms.u_world = this.world;
 		this.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(this.world));
-		this.uniforms.u_worldViewProjection = m4.multiply(this.world, this.viewProjection);
+		this.uniforms.u_worldViewProjection = m4.multiply(this.world, this.camera.viewProjectionMatrix);
 
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
