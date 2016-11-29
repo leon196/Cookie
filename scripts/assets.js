@@ -2,8 +2,8 @@
 "use strict";
 var assets = {};
 var filePathList = [
-	"assets/shaders/cube.vert", 
-	"assets/shaders/cube.frag",
+	"assets/shaders/diffuse.vert", 
+	"assets/shaders/diffuse.frag",
 	"assets/models/Cookie.ply",
 	"assets/models/CookieCloud25k.ply",
 	"assets/shaders/particles/leaf.vert",

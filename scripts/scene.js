@@ -9,7 +9,7 @@ function Scene ()
 	this.init = function (time)
 	{
 		this.particleShader = new Shader("leaf.vert", "color.frag");
-		this.diffuseShader = new Shader("cube.vert", "cube.frag");
+		this.diffuseShader = new Shader("diffuse.vert", "diffuse.frag");
 
 		this.cookieMesh = new Mesh(CreateMeshBufferFromFile(assets["Cookie.ply"], { scale: 1.0 }));
 		this.particles = new Particles("CookieCloud25k.ply");
