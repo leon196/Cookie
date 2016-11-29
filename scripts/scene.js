@@ -15,7 +15,7 @@ function Scene ()
 		this.circleTexture = new Texture("assets/images/Circle.png");
 
 		this.frameBuffer = new FrameBuffer();
-		
+
 		this.uniforms = new Uniforms();
 		this.uniforms.u_diffuse = this.cookieTexture.data;
 		this.uniforms.u_sprite = this.circleTexture.data;
@@ -23,10 +23,15 @@ function Scene ()
 
 		this.camera = new Camera();
 		this.world = m4.identity();
+
+		this.actions = new Actions(cookieActions);
 	}
 
 	this.render = function (time)
 	{
+		this.world = m4.identity();
+		// this.world = this.actions.getRotation("SunAction");
+
 		this.uniforms.u_viewInverse = this.camera.matrix;
 		this.uniforms.u_world = this.world;
 		this.uniforms.u_view = this.camera.viewProjectionMatrix;
