@@ -3,6 +3,7 @@
 
 var gl, scene;
 var m4 = twgl.m4;
+var started = false;
 
 window.onload = function ()
 {
@@ -15,7 +16,6 @@ function init ()
 	twgl.setDefaults({attribPrefix: "a_"});
 	gl = twgl.getWebGLContext(document.getElementById("view"), { premultipliedAlpha: false, alpha: false });
 	scene = new Scene();
-	scene.init();
 }
 
 function render(time)
@@ -23,6 +23,10 @@ function render(time)
 	if (texturesLoaded)
 	{
 		time *= 0.001;
+		if (started == false) {
+			started = true;
+			scene.init(time);
+		}
 		twgl.resizeCanvasToDisplaySize(gl.canvas);
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 

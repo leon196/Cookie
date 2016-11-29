@@ -3,16 +3,16 @@
 
 function Scene ()
 {
-	this.init = function ()
+	this.cookieTexture = new Texture("assets/models/Cookie.png");
+	this.circleTexture = new Texture("assets/images/Circle.png");
+
+	this.init = function (time)
 	{
 		this.particleShader = new Shader("leaf.vert", "color.frag");
 		this.diffuseShader = new Shader("cube.vert", "cube.frag");
 
-		this.cookieMesh = new Mesh(CreateMeshBufferFromFile(assets["Cookie.ply"]));
+		this.cookieMesh = new Mesh(CreateMeshBufferFromFile(assets["Cookie.ply"], { scale: 1.0 }));
 		this.particles = new Particles("CookieCloud25k.ply");
-
-		this.cookieTexture = new Texture("assets/models/Cookie.png");
-		this.circleTexture = new Texture("assets/images/Circle.png");
 
 		this.frameBuffer = new FrameBuffer();
 
@@ -25,12 +25,21 @@ function Scene ()
 		this.world = m4.identity();
 
 		this.actions = new Actions(cookieActions);
+
+		this.timeStarted = time;
 	}
 
 	this.render = function (time)
 	{
 		this.world = m4.identity();
-		// this.world = this.actions.getRotation("SunAction");
+
+		time -= this.timeStarted;
+
+		this.camera.setPosition(this.actions.evaluate("CameraAction", "location", time));
+		this.uniforms.u_lightWorldPos = this.actions.evaluate("SunAction", "location", time);
+		// this.world = m4.rotateX(this.world, sunRotation[0]);
+		// this.world = m4.rotateY(this.world, sunRotation[1]);
+		// this.world = m4.rotateZ(this.world, sunRotation[2]);
 
 		this.uniforms.u_viewInverse = this.camera.matrix;
 		this.uniforms.u_world = this.world;

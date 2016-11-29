@@ -11,4 +11,12 @@ function Camera ()
 	this.matrix = m4.lookAt(this.position, this.target, this.up);
 	this.viewMatrix = m4.inverse(this.matrix);
 	this.viewProjectionMatrix = m4.multiply(this.viewMatrix, this.projection);
+
+	this.setPosition = function (position)
+	{
+		this.position = position;
+		this.matrix = m4.lookAt(this.position, this.target, this.up);
+		this.viewMatrix = m4.inverse(this.matrix);
+		this.viewProjectionMatrix = m4.multiply(this.viewMatrix, this.projection);
+	}
 }

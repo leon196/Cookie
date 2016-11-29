@@ -5,6 +5,7 @@ function CreateMeshBufferFromFile (meshData, info)
 {
 	info = info || {};
 	var wired = info.wired || false;
+	var scale = info.scale || 1;
 
 	var mesh = {
 		position: { numComponents: 3, data: [] }, 
@@ -21,7 +22,7 @@ function CreateMeshBufferFromFile (meshData, info)
 		// position, normals, texcoord
 		if (column.length == 8)
 		{
-			Array.prototype.push.apply(mesh.position.data, [ parseFloat(column[0]), parseFloat(column[1]), parseFloat(column[2]) ]);
+			Array.prototype.push.apply(mesh.position.data, [ parseFloat(column[0]) * scale, parseFloat(column[1]) * scale, parseFloat(column[2]) * scale ]);
 			Array.prototype.push.apply(mesh.normal.data, [ parseFloat(column[3]), parseFloat(column[4]), parseFloat(column[5]) ]);
 			Array.prototype.push.apply(mesh.texcoord.data, [ parseFloat(column[6]), parseFloat(column[7]) ]);
 		}
